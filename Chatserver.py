@@ -2,7 +2,7 @@ import socketserver
 import threading
 
 HOST = ''
-PORT = 9010
+PORT = 9009
 lock = threading.Lock()
 
 class UserManager:
@@ -38,10 +38,10 @@ class UserManager:
         if msg[0] != '/':
             self.sendMessageToAll("[%s] %s" %(username, msg))
             return
-
-        if msg.strip() == "/quit":
-            self.removeUser(username)
-            return -1
+        else:
+            if msg.strip() == "/quit":
+                self.removeUser(username)
+                return -1
 
     def sendMessageToAll(self, msg):
         for conn, addr in self.users.values():
@@ -58,7 +58,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             username = self.registerUsername()
             msg = self.request.recv(1024)
             while msg:
-                print(msg.decode())
+                print("[%s:%s] %s" %(self.client_address[0],username, msg.decode()))
                 if self.usermanager.messageHandler(username, msg.decode()) == -1:
                     self.request.close()
                     break

@@ -1,8 +1,8 @@
 import socket
 from threading import Thread
 
-HOST = "localhost"
-PORT = 9010
+HOST = "192.168.111.100"
+PORT = 9009
 
 def rcvMsg(sock):
     while True:

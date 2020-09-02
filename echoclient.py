@@ -9,7 +9,7 @@ def getFileFromServer(filename):
         sock.connect((HOST, PORT))
         service = "file_transfer"
         sock.sendall(service.encode())
-        time.sleep(0.5) # waitting for server
+        time.sleep(0.1) # waitting for server
 
         sock.sendall(filename.encode())
         data = sock.recv(1024) # 1024바이트씩 전달받아서 data에 모두 쌓는다

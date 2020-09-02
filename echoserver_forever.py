@@ -44,6 +44,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             data_transferred = 0
             print("파일 전송 시스템에 [%s] 연결됨!" %self.client_address[0])
 
+
             filename = self.request.recv(1024)
             filename = filename.decode()
 

@@ -1,8 +1,8 @@
 import socketserver
 import threading
 
-HOST = ""
-PORT = 9009
+HOST = ''
+PORT = 9010
 lock = threading.Lock()
 
 class UserManager:
@@ -51,7 +51,7 @@ class UserManager:
 class MyTcpHandler(socketserver.BaseRequestHandler):
     usermanager = UserManager()
 
-    def handel(self):
+    def handle(self):
         print("[%s] 연결됨" %self.client_address[0])
 
         try:
@@ -70,10 +70,10 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
     def registerUsername(self):
         while True:
-            self.request.send("로그인 ID:".encode())
+            self.request.send("로그인 ID:".encode())   # self.request는 소켓이다..
             username = self.request.recv(1024)
             username = username.decode().strip()
-            if self.usermanager.addUser(username, self.request, self.client_address): # self.request는 소켓이다..
+            if self.usermanager.addUser(username, self.request, self.client_address):
                 return username
 
 class ChatingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):

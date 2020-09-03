@@ -1,27 +1,36 @@
 import socketserver
 from os.path import exists
 import os
+import codecs
 
 HOST = ''
 PORT = 9009
 
-def FindFileinServerRepo(filename):
+def FindFileinServerRepo(): # repo/server/ 아래의 파일과 디렉토리 출력
     ServerRepo = os.getcwd() + "/repo/server/"
     file_list = os.listdir(ServerRepo)
-
     sorted_file_list = []
-    for file in file_list:
-        if os.path.isfile(file):
-            sorted_file_list.append("FILE&" + file)
-        elif os.path.isdir(file):
-            sorted_file_list.append("DIRECTORY&" + file)
+    msg = "###디렉토리는 액세스 할 수 없습니다###\n"
 
-    sorted_file_list = sorted(sorted_file_list, reverse=True)
+    for file in file_list:
+        if os.path.isfile(ServerRepo + file):
+            sorted_file_list.append(("FILE", file))
+        elif os.path.isdir(ServerRepo + file):
+            sorted_file_list.append(("DIRECTORY", file))
+    sorted_file_list.sort()
+
+    for type, filename in sorted_file_list:
+        if type == "FILE":
+            msg += "[FILE] %s\n" % filename
+        elif type == "DIRECTORY":
+            msg += "[DIRECTORY] %s\n" % filename
+    return msg
+
 
 
 class MyTcpHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        self.service = self.request.recv(1024).decode()
+        self.service = self.request.recv(1024).decode() # 서비스 종류 받기
 
         # echo 서비스를 진행할 코드
         if self.service == "chat":
@@ -44,13 +53,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             data_transferred = 0
             print("파일 전송 시스템에 [%s] 연결됨!" %self.client_address[0])
 
-
-            filename = self.request.recv(1024)
-            filename = filename.decode()
-
-            # 나중에 추가할 리포지터리 파일 출력 기능
-            # sorted_file_list = FindFileinServerRepo(filename)
-            # self.request.send(sorted_file_list.encode())
+            filename = self.request.recv(1024).decode()
 
             server_file_path = os.getcwd() + "/repo/server/" + filename
             # print(server_file_path)
@@ -73,6 +76,26 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
             print("전송 완료! [%d]Bytes" %data_transferred)
 
+        if self.service == "file_upload":
+            print("[%s]에서 파일 업로드" %self.client_address[0])
+            server_file_path = os.getcwd() + "/repo/server/"
+            filename = self.request.recv(1024).decode()
+
+            data_transferred = 0
+            with open(server_file_path + filename, 'wb') as file:
+                try:
+                    data = self.request.recv(1024)
+                    while data:
+                        file.write(data)
+                        data_transferred += len(data)
+                        data = self.request.recv(1024)
+                except Exception as e:
+                    print(e)
+
+        if self.service == "file_list":
+            print("[%s]에서 파일 탐색" %self.client_address[0])
+            msg = FindFileinServerRepo()
+            self.request.sendall(msg.encode())
 
 def runServer():
     print("+++Echo/file transfer server is started")

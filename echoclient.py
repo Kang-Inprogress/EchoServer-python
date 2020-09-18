@@ -30,7 +30,7 @@ def getFileFromServer(filename):
             except Exception as e:
                 print(e)
 
-        print("[%s]의 전송완료. 크기 [%d]" %(filename, data_transferred))
+        print("[%s]의 전송완료. 크기 [%d]Bytes" %(filename, data_transferred))
 
 def getFileListFromServer():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:

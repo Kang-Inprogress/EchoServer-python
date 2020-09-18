@@ -1,7 +1,6 @@
 import socketserver
 from os.path import exists
 import os
-import codecs
 
 HOST = ''
 PORT = 9009
@@ -76,6 +75,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
             print("전송 완료! [%d]Bytes" %data_transferred)
 
+        # 파일 업로드
         if self.service == "file_upload":
             print("[%s]에서 파일 업로드" %self.client_address[0])
             server_file_path = os.getcwd() + "/repo/server/"
@@ -92,6 +92,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
                 except Exception as e:
                     print(e)
 
+        # 파일 탐색
         if self.service == "file_list":
             print("[%s]에서 파일 탐색" %self.client_address[0])
             msg = FindFileinServerRepo()
